@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "dev": "deno run --watch=$(deno eval -p 'Deno.args.join(\",\")' ./**/src/*) --allow-read --allow-net --allow-env --allow-sys --unstable-kv ./src/main.ts"
+  }
+}

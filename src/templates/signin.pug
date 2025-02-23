@@ -1,0 +1,19 @@
+head
+  title Library Booking
+body
+  include components/signedout-nav.pug
+  main
+    form(method="POST", action="/signin")
+      h1 Sign In
+      div
+        label
+          | Username
+          input(name="username")
+      div
+        label
+          | Password
+          input(name="password" type="password")
+      button Sign In
+    div
+      span Don't have an account yet?
+      a(href="/signup")  Sign Up
