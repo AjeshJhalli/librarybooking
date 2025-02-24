@@ -1,0 +1,25 @@
+include components/head.pug
+body
+  include components/signedin-nav.pug
+  main
+    h1 Admin Console
+    p All settings for application should go here
+    h2 Users
+    table
+      thead
+        tr
+          th Username
+          th Name
+          th Is Admin
+      tbody
+        each u in users
+          tr
+            td= u.username
+            td
+            td
+              if u.isAdmin
+                input(type="checkbox", name="#{u.username}isAdmin" checked)
+              else
+                input(type="checkbox" name="#{u.username}isAdmin" )
+            
+

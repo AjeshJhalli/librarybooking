@@ -9,6 +9,7 @@ import {
   createSession,
   createUser,
   generateSessionToken,
+  getAllUsers,
   getUser,
   userExists,
   validateSessionToken,
@@ -33,6 +34,7 @@ const templateSignIn = pug.compileFile("./src/templates/signin.pug");
 const templateSignUp = pug.compileFile("./src/templates/signup.pug");
 const templateProfile = pug.compileFile("./src/templates/profile.pug");
 const templateBookings = pug.compileFile("./src/templates/bookings.pug");
+const templateAdmin = pug.compileFile("./src/templates/admin.pug");
 
 app.get("/", async (req, res) => {
   const { user } = await validateSessionToken(req.cookies.token);
@@ -45,6 +47,24 @@ app.get("/", async (req, res) => {
   res.send(templateIndex());
 });
 
+app.get("/admin", async (req, res) => {
+  const { user } = await validateSessionToken(req.cookies.token);
+
+  const users = await getAllUsers();
+
+  if (!user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  if (!user.isAdmin) {
+    res.redirect("/bookings");
+    return;
+  }
+
+  res.send(templateAdmin({ user, users}));
+});
+
 app.get("/bookings", async (req, res) => {
   const { user } = await validateSessionToken(req.cookies.token);
 
@@ -54,7 +74,7 @@ app.get("/bookings", async (req, res) => {
   }
 
   res.send(
-    templateBookings({ session: req.cookies.token, username: user?.username }),
+    templateBookings({ user }),
   );
 });
 
@@ -67,7 +87,7 @@ app.get("/profile", async (req, res) => {
   }
 
   res.send(
-    templateProfile({ session: req.cookies.token, username: user?.username }),
+    templateProfile({ user }),
   );
 });
 
@@ -117,8 +137,9 @@ app.post("/signout", (req, res) => {
       "Set-Cookie":
         `token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly`,
       "Access-Control-Allow-Credentials": "true",
+      "HX-Redirect": "/signin"
     })
-    .redirect("/signin");
+    .send();
 });
 
 app.post("/signup", [

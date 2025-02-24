@@ -2,5 +2,6 @@ nav
   ul
     li: a(href="/profile") Profile
     li: a(href="/bookings") Bookings
-    li
-      form(method="POST", action="/signout"): button Sign Out
+    if user.isAdmin
+      li: a(href="/admin") Admin Console
+    li: a(hx-post="/signout", style="cursor: pointer") Sign Out

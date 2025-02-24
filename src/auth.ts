@@ -8,13 +8,31 @@ import { nanoid } from "https://deno.land/x/nanoid@v3.0.0/mod.ts";
 
 const kv = await Deno.openKv();
 
-console.log(await Array.fromAsync(kv.list({ prefix: [] })))
+console.log(await Array.fromAsync(kv.list({ prefix: [] })));
+
+// const userRecord = await kv.get<User>(["users", "username", "ajeshadmin"]);
+
+// if (userRecord.versionstamp) {
+// 	await kv.atomic()
+// 		.set(["users", "id", userRecord.value.id], {
+// 			...userRecord.value,
+// 			isAdmin: true,
+// 		})
+// 		.set(["users", "username", userRecord.value.username], {
+// 			...userRecord.value,
+// 			isAdmin: true,
+// 		})
+// 		.commit();
+// }
 
 // (await Array.fromAsync(kv.list({ prefix: [] }))).forEach(async (record) => {
 // 	await kv.delete(record.key);
 // });
 
-export async function createUser(username: string, password: string): Promise<User> {
+export async function createUser(
+	username: string,
+	password: string,
+): Promise<User> {
 	const data = new TextEncoder().encode(password);
 	const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 	const passwordHash = encodeHex(hashBuffer);
@@ -23,6 +41,7 @@ export async function createUser(username: string, password: string): Promise<Us
 		id: nanoid(),
 		username,
 		passwordHash,
+		isAdmin: false
 	};
 
 	await kv.atomic()
@@ -41,6 +60,10 @@ export async function userExists(username: string): Promise<boolean> {
 export async function getUser(username: string): Promise<User | null> {
 	const userRecord = await kv.get<User>(["users", "username", username]);
 	return userRecord.value;
+}
+
+export async function getAllUsers() {
+	return (await Array.fromAsync(kv.list({ prefix: ["users", "username"] }))).map(user => user.value);
 }
 
 export function generateSessionToken(): string {
@@ -84,7 +107,6 @@ export async function validateSessionToken(
 	const session = sessionRecord.value;
 
 	if (Date.now() >= session.expiresAt) {
-
 		console.log("Token expired");
 
 		await kv.delete(["sessions", session.id]);
@@ -126,4 +148,5 @@ export interface User {
 	id: string;
 	username: string;
 	passwordHash: string;
+	isAdmin: boolean | undefined;
 }
