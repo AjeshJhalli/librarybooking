@@ -3,6 +3,18 @@ body
   include components/signedin-nav.pug
   main
     h1 Profile
-    p Username:
-    p= user.username
+    div Username:
+      span= user.username
+    div First Name:
+      span= user.firstName
+    div Last Name:
+      span= user.lastName
+    div Gender:
+      span= user.gender
+    div Nationality:
+      span= user.nationality
+    div Email Address:
+      span= user.emailAddress
+    
+    a(href="/edit-profile") Edit Profile
 

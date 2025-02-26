@@ -4,7 +4,16 @@ body
   main
     h1 Bookings
     a(href="/new-booking") Make a new booking
-    ol
-      li booking 1
-      li booking 2
+    table
+      thead
+        tr
+          th ID
+          th Start Date
+          th End Date
+      tbody  
+        each booking in bookings
+          tr
+            td= booking.bookingId
+            td= booking.startDate
+            td= booking.endDate
 

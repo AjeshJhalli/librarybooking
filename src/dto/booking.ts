@@ -1,5 +1,7 @@
 import { Asset } from "./asset.ts";
 
+const kv = await Deno.openKv();
+
 export type Question = QuestionFreetext | QuestionDropdown;
 
 export type QuestionFreetext = {
@@ -29,8 +31,13 @@ export type Booking = {
   assets: Asset[];
 };
 
-export async function newBooking() {
+export async function newBooking(userId: string, booking: Booking) {
+  await kv.set(["bookings", userId, booking.bookingId], booking);
+}
 
-  
 
+export async function getBookings(userId: string) {
+  const bookings = (await Array.fromAsync(await kv.list({ prefix: ["bookings", userId] }))).map(booking => booking.value);
+
+  return bookings;
 }

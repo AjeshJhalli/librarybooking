@@ -1,0 +1,19 @@
+include components/head.pug
+body
+  include components/signedin-nav.pug
+  main
+    h1 Profile
+    form(method="POST")  
+      fieldset 
+        label(for="firstName") First Name
+        input(type="text", value=user.firstName, name="firstName")
+        label(for="lastName") Last Name
+        input(type="text", value=user.lastName, name="lastName")
+        label(for="gender") Gender
+        input(type="text", value=user.gender, name="gender")
+        label(for="nationality") Nationality
+        input(type="text", value=user.nationality, name="nationality")
+        label(for="emailAddress") Email Address
+        input(type="email", value=user.emailAddress, name="emailAddress")
+      button Save
+

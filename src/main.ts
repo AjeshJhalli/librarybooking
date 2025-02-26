@@ -16,13 +16,13 @@ import {
 } from "./auth.ts";
 import cookieParser from "npm:cookie-parser";
 import { encodeHex } from "jsr:@std/encoding/hex";
+import { Booking, getBookings, newBooking } from "./dto/booking.ts";
+import { nanoid } from "https://deno.land/x/nanoid@v3.0.0/mod.ts";
+import setUser from "./dto/profile.ts";
 
-// Users
-// Bookings
 // Calendar
 // Xero Integration
-// Assets
-// Configurable questions
+
 
 const app = express();
 
@@ -35,6 +35,8 @@ const templateSignUp = pug.compileFile("./src/templates/signup.pug");
 const templateProfile = pug.compileFile("./src/templates/profile.pug");
 const templateBookings = pug.compileFile("./src/templates/bookings.pug");
 const templateNewBooking = pug.compileFile("./src/templates/new-booking.pug");
+const templateBookingConfirmation = pug.compileFile("./src/templates/booking-confirmation.pug");
+const templateEditProfile = pug.compileFile("./src/templates/edit-profile.pug");
 const templateAdmin = pug.compileFile("./src/templates/admin.pug");
 
 app.get("/", async (req, res) => {
@@ -63,7 +65,7 @@ app.get("/admin", async (req, res) => {
     return;
   }
 
-  res.send(templateAdmin({ user, users}));
+  res.send(templateAdmin({ user, users }));
 });
 
 app.get("/bookings", async (req, res) => {
@@ -74,8 +76,10 @@ app.get("/bookings", async (req, res) => {
     return;
   }
 
+  const bookings = await getBookings(user.id)
+
   res.send(
-    templateBookings({ user }),
+    templateBookings({ user, bookings }),
   );
 });
 
@@ -92,6 +96,31 @@ app.get("/new-booking", async (req, res) => {
   );
 });
 
+app.post("/new-booking", async (req, res) => {
+  const { user } = await validateSessionToken(req.cookies.token);
+
+  console.log(req.body);
+
+  const bookingId = nanoid();
+
+  const booking: Booking = {
+    bookingId: bookingId,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+  }
+
+  await newBooking(user.id, booking);
+
+  if (!user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  res.send(
+    templateBookingConfirmation({ user }),
+  );
+});
+
 app.get("/profile", async (req, res) => {
   const { user } = await validateSessionToken(req.cookies.token);
 
@@ -104,6 +133,40 @@ app.get("/profile", async (req, res) => {
     templateProfile({ user }),
   );
 });
+
+app.get("/edit-profile", async (req, res) => {
+  const { user } = await validateSessionToken(req.cookies.token);
+
+  if (!user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  res.send(
+    templateEditProfile({ user }),
+  );
+});
+
+app.post("/edit-profile", async (req, res) => {
+  const { user } = await validateSessionToken(req.cookies.token);
+
+  if (!user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  await setUser({
+    ...user,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    gender: req.body.gender,
+    nationality: req.body.nationality,
+    emailAddress: req.body.emailAddress,
+  });
+
+  res.redirect("/profile");
+});
+
 
 app.get("/signin", (req, res) => {
   res.send(templateSignIn());
