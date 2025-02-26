@@ -34,6 +34,7 @@ const templateSignIn = pug.compileFile("./src/templates/signin.pug");
 const templateSignUp = pug.compileFile("./src/templates/signup.pug");
 const templateProfile = pug.compileFile("./src/templates/profile.pug");
 const templateBookings = pug.compileFile("./src/templates/bookings.pug");
+const templateNewBooking = pug.compileFile("./src/templates/new-booking.pug");
 const templateAdmin = pug.compileFile("./src/templates/admin.pug");
 
 app.get("/", async (req, res) => {
@@ -75,6 +76,19 @@ app.get("/bookings", async (req, res) => {
 
   res.send(
     templateBookings({ user }),
+  );
+});
+
+app.get("/new-booking", async (req, res) => {
+  const { user } = await validateSessionToken(req.cookies.token);
+
+  if (!user) {
+    res.redirect("/signin");
+    return;
+  }
+
+  res.send(
+    templateNewBooking({ user }),
   );
 });
 

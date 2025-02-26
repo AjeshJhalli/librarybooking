@@ -1,0 +1,57 @@
+include components/head.pug
+body
+  include components/signedin-nav.pug
+  main
+    h1 New Booking
+    
+    form(method="POST")
+      fieldset 
+        label(for="firstName") First Name
+        input(type="text", name="firstName")
+        label(for="lastName") Last Name
+        input(type="text", name="lastName")
+        label(for="gender") Gender
+        select
+          option(value="", disabled, selected)
+          option Male
+          option Female
+        label(for="dob") Date of Birth
+        input(type="date", name="dob")
+        label(for="nationality") Nationality
+        input(type="text", name="nationality")
+        label(for="emailAddress") Email Address
+        input(type="email", name="emailAddress")
+        label(for="phoneNumberMain") Phone Number (Main)
+        input(type="tel", name="phoneNumberMain")
+        label(for="phoneNumberOther") Phone Number (Other)
+        input(type="tel", name="phoneNumberOther")
+      fieldset 
+        label(for="bookingType")
+          | Booking Type:
+          label
+            input(type="radio", name="bookingType", value="Day Pass")
+            | Day Pass
+          label
+            input(type="radio", name="bookingType", value="Library Booking")
+            | Library Booking
+          label
+            input(type="radio", name="bookingType", value="Library Booking With Accommodation")
+            | Library Booking With Accommodation
+          label(for="room") Room
+          select
+            option(value="", disabled, selected)
+            option Standard Room
+            option Hex Room
+          label(for="desk") Desk
+          select
+            option(value="", disabled, selected)
+            option Standard Desk
+            option Premium Desk
+            option Golden Desk
+          label(for="startDate") Start Date
+          input(type="date", name="startDate")
+          label(for="endDate") End Date
+          input(type="date", name="endDate")
+      button(type="submit") Submit
+
+
